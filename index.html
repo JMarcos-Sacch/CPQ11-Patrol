@@ -62,8 +62,8 @@ header p{font-size:14px;color:var(--text-secondary)}
 .theme-switch {
     position: relative;
     display: inline-block;
-    width: 54px;
-    height: 18px;
+    width: 56px;
+    height: 30px;
     cursor: pointer;
 }
 .theme-switch input {
@@ -86,10 +86,10 @@ header p{font-size:14px;color:var(--text-secondary)}
 .slider::before {
     position: absolute;
     content: "";
-    height: 30px;
-    width: 30px;
-    left: 4px;
-    bottom: 4px;
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
     background-color: #ffffff;
     border-radius: 50%;
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -97,30 +97,20 @@ header p{font-size:14px;color:var(--text-secondary)}
 }
 /* Ícones internos do Switch */
 .icon-sun, .icon-moon {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1;
     transition: transform 0.3s ease;
 }
-/* Desenho do Sol (CSS puro) */
-.icon-sun::before {
-    content: "L";
-    font-size: 15px;
-}
-/* Desenho da Lua (CSS puro) */
-.icon-moon::before {
-    content: "D";
-    font-size: 15px;
-}
 /* Movimentação e inversão de cores com base no estado do checkbox */
 input:checked + .slider {
     background-color: #ffffff; /* Fundo branco no dark mode */
 }
 input:checked + .slider::before {
-    transform: translateX(36px);
+    transform: translateX(26px);
     background-color: #0f172a; /* Bolha escura no dark mode */
 }
 
