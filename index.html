@@ -273,7 +273,34 @@ atualizarLinkWhatsAppOtimizado(ultimosAcessos);
 
 if(typeof navigator.vibrate==='function'){navigator.vibrate(35);}
 }
+function atualizarLinkWhatsAppOtimizado(ultimosAcessos){
+let linhasTexto=[];
+const espacamentoFixo = 16; // Garante que todas as salas ocupem o mesmo espaço físico na tela
 
+listaSalas.forEach(sala=>{
+    if(ultimosAcessos[sala]&&ultimosAcessos[sala].hora){
+        // Calcula quantos pontos faltam para alinhar o texto
+        const pontosFaltantes = espacamentoFixo - sala.length;
+        const espacos = " ".repeat(pontosFaltantes > 0 ? pontosFaltantes : 1);
+        linhasTexto.push(`${sala}:${espacos}${ultimosAcessos[sala].hora}`);
+    }
+});
+
+const btnLink=document.getElementById('link-whatsapp');
+if(linhasTexto.length===0){
+    btnLink.href="javascript:void(0);";
+    return;
+}
+
+let dataHoje=new Date().toLocaleDateString('pt-BR');
+let textoMsn = `📋 *REGISTRO DE ACESSOS* (${dataHoje})\n`;
+textoMsn += "```\n"; // Abre o bloco de código monoespaçado no WhatsApp
+textoMsn += linhasTexto.join("\n");
+textoMsn += "\n```"; // Fecha o bloco de código
+
+btnLink.href=`https://api.whatsapp.com/send?text=${encodeURIComponent(textoMsn)}`;
+}
+    
 function atualizarMostradoresLaterais(ultimosAcessos){
 listaSalas.forEach(sala=>{
 const idSala=gerarIdValido(sala);
