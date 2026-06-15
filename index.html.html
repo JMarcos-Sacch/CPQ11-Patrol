@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Acesso - Salas</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Controle Acesso">
+
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Controle%20de%20Acesso%22%2C%22short_name%22%3A%22Controle%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f4f6f9%22%2C%22theme_color%22%3A%22%231e293b%22%2C%22orientation%22%3A%22portrait%22%7D">
+
+<style>
+/* Variáveis de Cores para Light e Dark Mode */
+:root {
+    --bg-body: #f4f6f9;
+    --bg-card: #ffffff;
+    --bg-linha: #f8fafc;
+    --border-linha: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --btn-disabled: #cbd5e1;
+    --btn-disabled-text: #64748b;
+    --switch-bg: #1e293b;
+    --switch-blob: #ffffff;
+    --switch-icon: #f59e0b;
+    --switch-icon-inactive: #94a3b8;
+}
+
+[data-theme="dark"] {
+    --bg-body: #0f172a;
+    --bg-card: #1e293b;
+    --bg-linha: #334155;
+    --border-linha: #475569;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --btn-disabled: #475569;
+    --btn-disabled-text: #94a3b8;
+    --switch-bg: #ffffff;
+    --switch-blob: #0f172a;
+    --switch-icon: #94a3b8;
+    --switch-icon-inactive: #f59e0b;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{background:var(--bg-body);color:var(--text-primary);padding:20px 15px 40px;-webkit-user-select:none;user-select:none;transition: background 0.3s, color 0.3s}
+.container{max-width:600px;margin:0 auto}
+
+/* Cabeçalho com o Switch Alinhado à Direita */
+header{display: flex; justify-content: space-between; align-items: center; margin-bottom:25px; padding:10px 0}
+.header-texto{text-align: left}
+header h1{font-size:24px;color:var(--text-primary);margin-bottom:4px;font-weight:700}
+header p{font-size:14px;color:var(--text-secondary)}
+
+/* --- ESTILO DO SWITCH (IDÊNTICO AO ANEXO) --- */
+.theme-switch-wrapper {
+    display: inline-flex;
+}
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 74px;
+    height: 38px;
+    cursor: pointer;
+}
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #1e293b; /* Fundo escuro quando no light mode */
+    border-radius: 34px;
+    transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+}
+/* A bolha deslizante */
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 30px;
+    width: 30px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+}
+/* Ícones internos do Switch */
+.icon-sun, .icon-moon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+/* Desenho do Sol (CSS puro) */
+.icon-sun::before {
+    content: "L";
+    font-size: 15px;
+}
+/* Desenho da Lua (CSS puro) */
+.icon-moon::before {
+    content: "D";
+    font-size: 15px;
+}
+/* Movimentação e inversão de cores com base no estado do checkbox */
+input:checked + .slider {
+    background-color: #ffffff; /* Fundo branco no dark mode */
+}
+input:checked + .slider::before {
+    transform: translateX(36px);
+    background-color: #0f172a; /* Bolha escura no dark mode */
+}
+
+/* --- RESTANTE DA INTERFACE ADAPTADA --- */
+.card{background:var(--bg-card);border-radius:12px;padding:20px;box-shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -1px rgba(0,0,0,.03);margin-bottom:20px;transition: background 0.3s}
+.section-title{font-size:16px;color:var(--text-secondary);margin-bottom:15px;font-weight:600;text-transform:uppercase}
+.lista-botoes-verticais{display:flex;flex-direction:column;gap:10px}
+.linha-sala{display:flex;align-items:center;justify-content:space-between;background:var(--bg-linha);padding:8px;border-radius:8px;border:1px solid var(--border-linha);transition: background 0.3s, border 0.3s}
+.btn-sala{background:#2563eb;color:#fff;border:none;padding:14px 16px;font-size:14px;font-weight:600;border-radius:6px;cursor:pointer;width:55%;text-align:left;-webkit-tap-highlight-color:transparent}
+.btn-sala:disabled{background:var(--btn-disabled)!important;color:var(--btn-disabled-text)!important;cursor:not-allowed;opacity:1}
+.mostrador-horario{width:42%;text-align:right;padding-right:8px}
+.hora-atual{font-size:16px;font-weight:700;color:var(--text-primary)}
+.data-atual{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.sem-registro-sala{font-size:13px;color:var(--text-muted);font-style:italic}
+.acoes-secundarias{margin-top:15px;display:flex;gap:10px}
+.btn-action{flex:1;padding:12px;font-size:13px;font-weight:600;border-radius:6px;border:none;text-decoration:none;text-align:center}
+.btn-whats{background:#25d366;color:#fff}
+.btn-limpar{background:#ef4444;color:#fff}
+.lista-registros{max-height:250px;overflow-y:auto;margin-top:10px}
+.item-registro{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-linha);color:var(--text-primary)}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="header-texto">
+    <h1>Controle de Acesso</h1>
+    <p>Toque para registrar a entrada</p>
+</div>
+<div class="theme-switch-wrapper">
+    <label class="theme-switch" for="checkbox-tema">
+        <input type="checkbox" id="checkbox-tema" />
+        <div class="slider">
+            <div class="icon-sun"></div>
+            <div class="icon-moon"></div>
+        </div>
+    </label>
+</div>
+</header>
+
+<div class="card">
+<div class="section-title">Salas e Dependências</div>
+<div class="lista-botoes-verticais" id="container-salas"></div>
+</div>
+
+<div class="card">
+<div class="section-title">Histórico de Cliques (Geral)</div>
+<div class="lista-registros" id="lista-registros"></div>
+
+<div class="acoes-secundarias">
+<a id="link-whatsapp" class="btn-action btn-whats" href="javascript:void(0);" onclick="validarEnvio(event)">Enviar p/ WhatsApp</a>
+<button class="btn-action btn-limpar" onclick="limparTudo()">Limpar Tudo</button>
+</div>
+</div>
+</div>
+
+<script>
+const listaSalas=[
+"Start","SOC","LOBBY","CE SHOP","SECURE STORAGE",
+"HIGH-VALUE","LOADING DOCK","ER1","GEN STORAGE","SHRED",
+"Cable Storage","FCR","SER ROOM","OPEN OFFICE","BREAKROOM",
+"ER2","COLO 1","COLO 2","END TIME"
+];
+
+document.addEventListener("DOMContentLoaded",iniciarApp);
+
+function iniciarApp(){
+try{
+renderizarEstruturaSalas();
+carregarDados();
+inicializarTema();
+registrarServiceWorkerFalso();
+}catch(erro){
+alert("Erro ao iniciar: "+erro.message);
+console.error(erro);
+}
+}
+
+/* Gerenciamento do Dark/Light Mode */
+function inicializarTema(){
+const checkboxTema = document.getElementById('checkbox-tema');
+const temaSalvo = localStorage.getItem('app_theme') || 'light';
+
+if(temaSalvo === 'dark'){
+    document.documentElement.setAttribute('data-theme', 'dark');
+    checkboxTema.checked = true;
+} else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    checkboxTema.checked = false;
+}
+
+checkboxTema.addEventListener('change', (e) => {
+    if(e.target.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('app_theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('app_theme', 'light');
+    }
+});
+}
+
+function gerarIdValido(nomeSala){
+return 'sala-'+nomeSala.replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
+}
+
+function renderizarEstruturaSalas(){
+const container=document.getElementById('container-salas');
+container.innerHTML='';
+
+listaSalas.forEach(sala=>{
+const idValido=gerarIdValido(sala);
+
+const linha=document.createElement('div');
+linha.className='linha-sala';
+linha.setAttribute('data-sala',sala);
+
+const botao=document.createElement('button');
+botao.className='btn-sala';
+botao.id=`btn-${idValido}`;
+botao.textContent=sala;
+botao.addEventListener('click',()=>registrarAcesso(sala));
+
+const mostrador=document.createElement('div');
+mostrador.className='mostrador-horario';
+mostrador.id=`mostrador-${idValido}`;
+
+const span=document.createElement('span');
+span.className='sem-registro-sala';
+span.textContent='--:--:--';
+
+mostrador.appendChild(span);
+linha.appendChild(botao);
+linha.appendChild(mostrador);
+container.appendChild(linha);
+});
+}
+
+function registrarAcesso(nomeSala){
+const agora=new Date();
+const dataFormatada=agora.toLocaleDateString('pt-BR');
+const horaFormatada=agora.toLocaleTimeString('pt-BR');
+
+const novoRegistro={data:dataFormatada,hora:horaFormatada,sala:nomeSala,timestamp:agora.getTime()};
+
+let historico=JSON.parse(localStorage.getItem('v2_historico_geral'))||[];
+historico.unshift(novoRegistro);
+localStorage.setItem('v2_historico_geral',JSON.stringify(historico));
+
+let ultimosAcessos=JSON.parse(localStorage.getItem('v2_ultimos_acessos'))||{};
+ultimosAcessos[nomeSala]={hora:horaFormatada,data:dataFormatada};
+localStorage.setItem('v2_ultimos_acessos',JSON.stringify(ultimosAcessos));
+
+const botaoElemento=document.getElementById(`btn-${gerarIdValido(nomeSala)}`);
+if(botaoElemento) botaoElemento.disabled=true;
+
+atualizarMostradoresLaterais(ultimosAcessos);
+mostrarHistoricoGeral(historico);
+atualizarLinkWhatsAppOtimizado(ultimosAcessos);
+
+if(typeof navigator.vibrate==='function'){navigator.vibrate(35);}
+}
+
+function atualizarMostradoresLaterais(ultimosAcessos){
+listaSalas.forEach(sala=>{
+const idSala=gerarIdValido(sala);
+const m=document.getElementById(`mostrador-${idSala}`);
+const b=document.getElementById(`btn-${idSala}`);
+
+if(ultimosAcessos[sala]){
+if(m){
+m.innerHTML=`<div class="hora-atual">${ultimosAcessos[sala].hora}</div><div class="data-atual">${ultimosAcessos[sala].data}</div>`;
+}
+if(b){b.disabled=true;}
+}
+});
+}
+
+function mostrarHistoricoGeral(historico){
+const c=document.getElementById('lista-registros');
+c.innerHTML='';
+if(historico.length===0){
+c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:15px;font-style:italic;">Nenhum clique registrado.</div>';
+return;
+}
+historico.forEach(registro=>{
+const item=document.createElement('div');
+item.className='item-registro';
+item.innerHTML=`<div>${registro.sala}</div><div>${registro.hora}</div>`;
+c.appendChild(item);
+});
+}
+
+function carregarDados(){
+let historico=JSON.parse(localStorage.getItem('v2_historico_geral'))||[];
+let ultimosAcessos=JSON.parse(localStorage.getItem('v2_ultimos_acessos'))||{};
+atualizarMostradoresLaterais(ultimosAcessos);
+mostrarHistoricoGeral(historico);
+atualizarLinkWhatsAppOtimizado(ultimosAcessos);
+}
+
+function limparTudo(){
+if(confirm("Deseja realmente zerar todos os horários e o histórico?")){
+localStorage.removeItem('v2_historico_geral');
+localStorage.removeItem('v2_ultimos_acessos');
+renderizarEstruturaSalas();
+mostrarHistoricoGeral([]);
+document.getElementById('link-whatsapp').href="javascript:void(0);";
+}
+}
+
+function atualizarLinkWhatsAppOtimizado(ultimosAcessos){
+let linhasTexto=[];
+listaSalas.forEach(sala=>{
+if(ultimosAcessos[sala]&&ultimosAcessos[sala].hora){
+linhasTexto.push(`${sala}: ${ultimosAcessos[sala].hora}`);
+}
+});
+
+const btnLink=document.getElementById('link-whatsapp');
+if(linhasTexto.length===0){
+btnLink.href="javascript:void(0);";
+return;
+}
+
+let dataHoje=new Date().toLocaleDateString('pt-BR');
+let texto=`📋 *REGISTRO DE ACESSOS* (${dataHoje})\n\n${linhasTexto.join("\n")}`;
+btnLink.href=`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+}
+
+function validarEnvio(event){
+const btnLink=document.getElementById('link-whatsapp');
+if(btnLink.getAttribute('href')==="javascript:void(0);"){
+event.preventDefault();
+alert("Não há dados para enviar.");
+}
+}
+
+function registrarServiceWorkerFalso(){
+if('serviceWorker' in navigator){
+const blob=new Blob([`self.addEventListener('fetch',function(e){});`],{"type":'application/javascript'});
+const blobUrl=URL.createObjectURL(blob);
+navigator.serviceWorker.register(blobUrl).catch(function(err){});
+}
+}
+</script>
+</body>
+</html>
