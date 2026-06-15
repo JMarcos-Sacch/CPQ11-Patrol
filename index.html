@@ -192,6 +192,15 @@
             transform: scale(0.98);
         }
 
+        .btn-sala:disabled {
+            background-color: var(--border-linha) !important;
+            color: var(--text-secondary) !important;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.65;
+            transform: none !important;
+        }
+
         .linha-sala[data-sala="END TIME"] .btn-sala {
             background-color: #475569;
         }
