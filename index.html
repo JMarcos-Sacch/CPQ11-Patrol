@@ -349,7 +349,7 @@
                 linha.setAttribute('data-sala', sala);
 
                 linha.innerHTML = `
-                    <button class="btn-sala" onclick="registrarAcesso('${sala}')">${sala}</button>
+                    <button class="btn-sala" onclick="registrarAcesso('${sala}', event)">${sala}</button>
                     <div class="mostrador-horario" id="mostrador-${btoa(sala).replace(/=/g, '')}">
                         <span class="sem-registro-sala">--:--:--</span>
                     </div>
@@ -358,7 +358,7 @@
             });
         }
 
-        function registrarAcesso(nomeSala) {
+        function registrarAcesso(nomeSala, event) {
             const agora = new Date();
             const dataFormatada = agora.toLocaleDateString('pt-BR');
             const horaFormatada = agora.toLocaleTimeString('pt-BR');
@@ -381,6 +381,10 @@
             atualizarMostradoresLaterais(ultimosAcessos);
             mostrarHistóricoGeral(historico);
 
+            if (event && event.target) {
+                event.target.disabled = true;
+            }
+
             if (navigator.vibrate) { navigator.vibrate(35); }
         }
 
@@ -394,6 +398,12 @@
                         <div class="hora-atual">${ultimosAcessos[sala].hora}</div>
                         <div class="data-atual">${ultimosAcessos[sala].data}</div>
                     `;
+                    
+                    // Procura o botão que vem logo antes do mostrador e o desativa
+                    const botao = elemento.previousElementSibling;
+                    if (botao && botao.classList.contains('btn-sala')) {
+                        botao.disabled = true;
+                    }
                 }
             });
         }
