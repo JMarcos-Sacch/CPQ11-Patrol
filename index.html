@@ -208,11 +208,11 @@
         .mostrador-horario {
             text-align: right;
             padding-right: 4px;
-            min-width: 85px;
+            min-width: 65px;
         }
 
         .hora-atual {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--text-hora);
         }
@@ -224,7 +224,7 @@
         }
 
         .sem-registro-sala {
-            font-size: 13px;
+            font-size: 14px;
             color: #94a3b8;
             font-style: italic;
         }
@@ -420,7 +420,6 @@
     </div>
 
     <script>
-        // Lista atualizada com COLO 3 inserida entre COLO 2 e END TIME
         const listaSalas = [
             "Start", "SOC", "LOBBY", "CE SHOP", "SECURE STORAGE", 
             "HIGH-VALUE", "LOADING DOCK", "ER1", "GEN STORAGE", "SHRED", 
@@ -464,6 +463,11 @@
             return btoa(unescape(encodeURIComponent(sala))).replace(/=/g, '');
         }
 
+        // Função auxiliar para formatar a hora sem segundos (HH:MM)
+        function formatarHoraSemSegundos(dateObj) {
+            return dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
         function renderizarEstruturaSalas() {
             const container = document.getElementById('container-salas');
             container.innerHTML = '';
@@ -479,7 +483,7 @@
                         <button class="btn-sala" onclick="registrarAcesso('${sala}', event)">${sala}</button>
                         
                         <div class="mostrador-horario" id="mostrador-${salaId}">
-                            <span class="sem-registro-sala">--:--:--</span>
+                            <span class="sem-registro-sala">--:--</span>
                         </div>
 
                         <button class="btn-abrir-obs" id="btn-obs-${salaId}" title="Adicionar Observação" onclick="togglePainelObs('${salaId}')">+</button>
@@ -545,7 +549,7 @@
         function registrarAcesso(nomeSala, event) {
             const agora = new Date();
             const dataFormatada = agora.toLocaleDateString('pt-BR');
-            const horaFormatada = agora.toLocaleTimeString('pt-BR');
+            const horaFormatada = formatarHoraSemSegundos(agora);
 
             let ultimosAcessos = JSON.parse(localStorage.getItem('v2_ultimos_acessos')) || {};
             const obsExistente = ultimosAcessos[nomeSala] ? (ultimosAcessos[nomeSala].obs || '') : '';
@@ -591,8 +595,10 @@
 
                 if (dados) {
                     if (dados.hora) {
+                        // Trata dados legados que porventura guardavam os segundos
+                        let horaLimpa = dados.hora.length > 5 ? dados.hora.substring(0, 5) : dados.hora;
                         elemento.innerHTML = `
-                            <div class="hora-atual">${dados.hora}</div>
+                            <div class="hora-atual">${horaLimpa}</div>
                             <div class="data-atual">${dados.data}</div>
                         `;
                         
@@ -636,11 +642,12 @@
                 item.className = 'item-registro';
                 
                 let obsHtml = registro.obs ? `<div class="info-obs-hist">📝 <i>${registro.obs}</i></div>` : '';
+                let horaLimpa = registro.hora.length > 5 ? registro.hora.substring(0, 5) : registro.hora;
 
                 item.innerHTML = `
                     <div class="item-registro-topo">
                         <div class="info-sala-hist">${registro.sala}</div>
-                        <div class="info-hora-hist">${registro.hora} <span style="font-size:10px; color:#94a3b8; font-weight:normal;">(${registro.data})</span></div>
+                        <div class="info-hora-hist">${horaLimpa} <span style="font-size:10px; color:#94a3b8; font-weight:normal;">(${registro.data})</span></div>
                     </div>
                     ${obsHtml}
                 `;
@@ -665,34 +672,42 @@
             }
         }
 
-        /* Envio do WhatsApp Otimizado */
+        /* Envio do WhatsApp com Horários e Observações Separados */
         function enviarWhatsApp() {
             let ultimosAcessos = JSON.parse(localStorage.getItem('v2_ultimos_acessos')) || {};
-            let linhasTexto = [];
+            let linhasHorarios = [];
+            let linhasObs = [];
             const espacamentoFixo = 16; 
 
             listaSalas.forEach(sala => {
                 if (ultimosAcessos[sala] && ultimosAcessos[sala].hora) {
+                    let horaLimpa = ultimosAcessos[sala].hora.length > 5 ? ultimosAcessos[sala].hora.substring(0, 5) : ultimosAcessos[sala].hora;
                     const pontosFaltantes = espacamentoFixo - sala.length;
                     const espacos = " ".repeat(pontosFaltantes > 0 ? pontosFaltantes : 1);
-                    let linha = `${sala}:${espacos}${ultimosAcessos[sala].hora}`;
+                    
+                    linhasHorarios.push(`${sala}:${espacos}${horaLimpa}`);
+
                     if (ultimosAcessos[sala].obs) {
-                        linha += ` (Obs: ${ultimosAcessos[sala].obs})`;
+                        linhasObs.push(`• *${sala}*: ${ultimosAcessos[sala].obs}`);
                     }
-                    linhasTexto.push(linha);
                 }
             });
 
-            if (linhasTexto.length === 0) {
+            if (linhasHorarios.length === 0) {
                 alert("Não há dados para enviar.");
                 return;
             }
 
             let dataHoje = new Date().toLocaleDateString('pt-BR');
-            let textoMensagem = `📋 *REGISTRO DE ACESSOS - CPQ 11* (${dataHoje})\n`;
+            let textoMensagem = `📋 *REGISTRO DE ACESSOS - CPQ 11* (${dataHoje})\n\n`;
             textoMensagem += "```\n";
-            textoMensagem += linhasTexto.join("\n");
+            textoMensagem += linhasHorarios.join("\n");
             textoMensagem += "\n```";
+
+            if (linhasObs.length > 0) {
+                textoMensagem += "\n\n📌 *OBSERVAÇÕES:*\n";
+                textoMensagem += linhasObs.join("\n");
+            }
 
             const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensagem)}`;
             window.open(urlWhatsApp, '_blank');
