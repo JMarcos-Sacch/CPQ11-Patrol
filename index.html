@@ -19,6 +19,7 @@
             --text-secondary: #64748b;
             --text-hora: #0f172a;
             --hist-sala: #334155;
+            --bg-obs: #f1f5f9;
         }
 
         [data-theme="dark"] {
@@ -30,6 +31,7 @@
             --text-secondary: #94a3b8;
             --text-hora: #f8fafc;
             --hist-sala: #cbd5e1;
+            --bg-obs: #1e293b;
         }
 
         * {
@@ -76,7 +78,7 @@
             color: var(--text-secondary);
         }
 
-        /* --- ESTILO DO SWITCH (PROPORCIONAL AO ANEXO) --- */
+        /* --- ESTILO DO SWITCH --- */
         .theme-switch-wrapper {
             display: inline-flex;
         }
@@ -115,16 +117,6 @@
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 2;
         }
-        .icon-sun, .icon-moon {
-            width: 14px;
-            height: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-        .icon-sun::before { font-size: 11px; }
-        .icon-moon::before { font-size: 11px; }
         
         input:checked + .slider { background-color: #ffffff; }
         input:checked + .slider::before {
@@ -132,7 +124,7 @@
             background-color: #0f172a;
         }
 
-        /* --- RESTANTE DA ESTRUTURA --- */
+        /* --- CARD E LINHAS DE SALAS --- */
         .card {
             background: var(--bg-card);
             border-radius: 12px;
@@ -154,25 +146,30 @@
         .lista-botoes-verticais {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .wrapper-linha {
+            background: var(--bg-linha);
+            border-radius: 8px;
+            border: 1px solid var(--border-linha);
+            overflow: hidden;
+            transition: background 0.3s, border 0.3s;
         }
 
         .linha-sala {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--bg-linha);
             padding: 8px;
-            border-radius: 8px;
-            border: 1px solid var(--border-linha);
-            transition: background 0.3s, border 0.3s;
+            gap: 6px;
         }
 
         .btn-sala {
             background-color: #2563eb;
             color: white;
             border: none;
-            padding: 14px 16px;
+            padding: 12px 14px;
             font-size: 14px;
             font-weight: 600;
             border-radius: 6px;
@@ -180,7 +177,7 @@
             transition: background 0.2s, transform 0.1s;
             box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
             text-align: left;
-            width: 55%;
+            flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -201,27 +198,27 @@
             transform: none !important;
         }
 
-        .linha-sala[data-sala="END TIME"] .btn-sala {
+        .wrapper-linha[data-sala="END TIME"] .btn-sala {
             background-color: #475569;
         }
-        .linha-sala[data-sala="END TIME"] .btn-sala:active {
+        .wrapper-linha[data-sala="END TIME"] .btn-sala:active {
             background-color: #334155;
         }
 
         .mostrador-horario {
-            width: 42%;
             text-align: right;
-            padding-right: 8px;
+            padding-right: 4px;
+            min-width: 85px;
         }
 
         .hora-atual {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-hora);
         }
 
         .data-atual {
-            font-size: 11px;
+            font-size: 10px;
             color: #94a3b8;
             margin-top: 2px;
         }
@@ -232,6 +229,117 @@
             font-style: italic;
         }
 
+        /* --- BOTÃO MAIS / EDITAR OBSERVAÇÃO --- */
+        .btn-abrir-obs {
+            background-color: transparent;
+            border: 1px dashed #94a3b8;
+            color: var(--text-primary);
+            width: 34px;
+            height: 34px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-abrir-obs:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .btn-abrir-obs.tem-obs {
+            border-style: solid;
+            background-color: #3b82f61a;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        /* --- CAIXA DE TEXTO DA OBSERVAÇÃO --- */
+        .painel-obs {
+            display: none;
+            padding: 10px;
+            background: var(--bg-obs);
+            border-top: 1px solid var(--border-linha);
+        }
+
+        .painel-obs.ativo {
+            display: block;
+        }
+
+        .obs-input-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-obs {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-linha);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .input-obs:focus {
+            border-color: #2563eb;
+        }
+
+        .btn-icon-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn-icon-action:active {
+            opacity: 0.8;
+        }
+
+        .btn-salvar-obs {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-cancelar-obs {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .obs-contador {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .texto-obs-salva {
+            font-size: 12px;
+            color: #2563eb;
+            font-style: italic;
+            margin-top: 4px;
+            word-break: break-word;
+        }
+
+        [data-theme="dark"] .texto-obs-salva {
+            color: #60a5fa;
+        }
+
+        /* --- AÇÕES SECUNDÁRIAS --- */
         .acoes-secundarias {
             margin-top: 15px;
             display: flex;
@@ -263,16 +371,22 @@
 
         .item-registro {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
+            flex-direction: column;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border-linha);
             font-size: 14px;
+        }
+
+        .item-registro-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .item-registro:last-child { border-bottom: none; }
         .info-sala-hist { font-weight: 500; color: var(--hist-sala); }
         .info-hora-hist { font-weight: 600; color: #2563eb; }
+        .info-obs-hist { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
     </style></head><body>
 
     <div class="container">
@@ -284,10 +398,7 @@
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="checkbox-tema">
                     <input type="checkbox" id="checkbox-tema" />
-                    <div class="slider">
-                        <div class="icon-sun"></div>
-                        <div class="icon-moon"></div>
-                    </div>
+                    <div class="slider"></div>
                 </label>
             </div>
         </header>
@@ -309,11 +420,12 @@
     </div>
 
     <script>
+        // Lista atualizada com COLO 3 inserida entre COLO 2 e END TIME
         const listaSalas = [
             "Start", "SOC", "LOBBY", "CE SHOP", "SECURE STORAGE", 
             "HIGH-VALUE", "LOADING DOCK", "ER1", "GEN STORAGE", "SHRED", 
             "Cable Storage", "FCR", "SER ROOM", "OPEN OFFICE", "BREAKROOM", 
-            "ER2", "COLO 1", "COLO 2", "END TIME"
+            "ER2", "COLO 1", "COLO 2", "COLO 3", "END TIME"
         ];
 
         document.addEventListener("DOMContentLoaded", iniciarApp);
@@ -348,23 +460,86 @@
             });
         }
 
+        function getSalaId(sala) {
+            return btoa(unescape(encodeURIComponent(sala))).replace(/=/g, '');
+        }
+
         function renderizarEstruturaSalas() {
             const container = document.getElementById('container-salas');
             container.innerHTML = '';
 
             listaSalas.forEach(sala => {
-                const linha = document.createElement('div');
-                linha.className = 'linha-sala';
-                linha.setAttribute('data-sala', sala);
+                const salaId = getSalaId(sala);
+                const wrapper = document.createElement('div');
+                wrapper.className = 'wrapper-linha';
+                wrapper.setAttribute('data-sala', sala);
 
-                linha.innerHTML = `
-                    <button class="btn-sala" onclick="registrarAcesso('${sala}', event)">${sala}</button>
-                    <div class="mostrador-horario" id="mostrador-${btoa(sala).replace(/=/g, '')}">
-                        <span class="sem-registro-sala">--:--:--</span>
+                wrapper.innerHTML = `
+                    <div class="linha-sala">
+                        <button class="btn-sala" onclick="registrarAcesso('${sala}', event)">${sala}</button>
+                        
+                        <div class="mostrador-horario" id="mostrador-${salaId}">
+                            <span class="sem-registro-sala">--:--:--</span>
+                        </div>
+
+                        <button class="btn-abrir-obs" id="btn-obs-${salaId}" title="Adicionar Observação" onclick="togglePainelObs('${salaId}')">+</button>
+                    </div>
+
+                    <div class="painel-obs" id="painel-${salaId}">
+                        <div class="obs-input-container">
+                            <input type="text" class="input-obs" id="input-${salaId}" maxlength="100" placeholder="Observação (máx 100 caracteres)..." oninput="atualizarContador('${salaId}')" />
+                            <button class="btn-icon-action btn-salvar-obs" title="Salvar" onclick="salvarObservacao('${sala}', '${salaId}')">💾</button>
+                            <button class="btn-icon-action btn-cancelar-obs" title="Cancelar" onclick="fecharPainelObs('${salaId}')">✖</button>
+                        </div>
+                        <div class="obs-contador" id="contador-${salaId}">0/100</div>
+                        <div class="texto-obs-salva" id="obs-salva-${salaId}"></div>
                     </div>
                 `;
-                container.appendChild(linha);
+                container.appendChild(wrapper);
             });
+        }
+
+        function togglePainelObs(salaId) {
+            const painel = document.getElementById(`painel-${salaId}`);
+            if (painel.classList.contains('ativo')) {
+                fecharPainelObs(salaId);
+            } else {
+                painel.classList.add('ativo');
+                const input = document.getElementById(`input-${salaId}`);
+                input.focus();
+            }
+        }
+
+        function fecharPainelObs(salaId) {
+            const painel = document.getElementById(`painel-${salaId}`);
+            painel.classList.remove('ativo');
+        }
+
+        function atualizarContador(salaId) {
+            const input = document.getElementById(`input-${salaId}`);
+            const contador = document.getElementById(`contador-${salaId}`);
+            contador.textContent = `${input.value.length}/100`;
+        }
+
+        function salvarObservacao(nomeSala, salaId) {
+            const input = document.getElementById(`input-${salaId}`);
+            const textoObs = input.value.trim();
+
+            let ultimosAcessos = JSON.parse(localStorage.getItem('v2_ultimos_acessos')) || {};
+            
+            if (!ultimosAcessos[nomeSala]) {
+                ultimosAcessos[nomeSala] = { hora: null, data: null, obs: textoObs };
+            } else {
+                ultimosAcessos[nomeSala].obs = textoObs;
+            }
+
+            localStorage.setItem('v2_ultimos_acessos', JSON.stringify(ultimosAcessos));
+            
+            fecharPainelObs(salaId);
+            atualizarMostradoresLaterais(ultimosAcessos);
+
+            let historico = JSON.parse(localStorage.getItem('v2_historico_geral')) || [];
+            mostrarHistóricoGeral(historico);
         }
 
         function registrarAcesso(nomeSala, event) {
@@ -372,10 +547,14 @@
             const dataFormatada = agora.toLocaleDateString('pt-BR');
             const horaFormatada = agora.toLocaleTimeString('pt-BR');
 
+            let ultimosAcessos = JSON.parse(localStorage.getItem('v2_ultimos_acessos')) || {};
+            const obsExistente = ultimosAcessos[nomeSala] ? (ultimosAcessos[nomeSala].obs || '') : '';
+
             const novoRegistro = {
                 data: dataFormatada,
                 hora: horaFormatada,
                 sala: nomeSala,
+                obs: obsExistente,
                 timestamp: agora.getTime()
             };
 
@@ -383,8 +562,11 @@
             historico.unshift(novoRegistro);
             localStorage.setItem('v2_historico_geral', JSON.stringify(historico));
 
-            let ultimosAcessos = JSON.parse(localStorage.getItem('v2_ultimos_acessos')) || {};
-            ultimosAcessos[nomeSala] = { hora: horaFormatada, data: dataFormatada };
+            ultimosAcessos[nomeSala] = { 
+                hora: horaFormatada, 
+                data: dataFormatada,
+                obs: obsExistente 
+            };
             localStorage.setItem('v2_ultimos_acessos', JSON.stringify(ultimosAcessos));
 
             atualizarMostradoresLaterais(ultimosAcessos);
@@ -399,19 +581,42 @@
 
         function atualizarMostradoresLaterais(ultimosAcessos) {
             listaSalas.forEach(sala => {
-                const idMostrador = `mostrador-${btoa(sala).replace(/=/g, '')}`;
-                const elemento = document.getElementById(idMostrador);
-                
-                if (elemento && ultimosAcessos[sala]) {
-                    elemento.innerHTML = `
-                        <div class="hora-atual">${ultimosAcessos[sala].hora}</div>
-                        <div class="data-atual">${ultimosAcessos[sala].data}</div>
-                    `;
-                    
-                    // Procura o botão que vem logo antes do mostrador e o desativa
-                    const botao = elemento.previousElementSibling;
-                    if (botao && botao.classList.contains('btn-sala')) {
-                        botao.disabled = true;
+                const salaId = getSalaId(sala);
+                const elemento = document.getElementById(`mostrador-${salaId}`);
+                const btnObs = document.getElementById(`btn-obs-${salaId}`);
+                const obsSalvaElem = document.getElementById(`obs-salva-${salaId}`);
+                const inputObs = document.getElementById(`input-${salaId}`);
+
+                const dados = ultimosAcessos[sala];
+
+                if (dados) {
+                    if (dados.hora) {
+                        elemento.innerHTML = `
+                            <div class="hora-atual">${dados.hora}</div>
+                            <div class="data-atual">${dados.data}</div>
+                        `;
+                        
+                        const wrapper = elemento.closest('.wrapper-linha');
+                        if (wrapper) {
+                            const botao = wrapper.querySelector('.btn-sala');
+                            if (botao) botao.disabled = true;
+                        }
+                    }
+
+                    if (dados.obs) {
+                        btnObs.innerHTML = '✏️';
+                        btnObs.classList.add('tem-obs');
+                        btnObs.title = "Editar Observação";
+                        obsSalvaElem.textContent = `Obs: ${dados.obs}`;
+                        if (inputObs && document.activeElement !== inputObs) {
+                            inputObs.value = dados.obs;
+                            atualizarContador(salaId);
+                        }
+                    } else {
+                        btnObs.innerHTML = '+';
+                        btnObs.classList.remove('tem-obs');
+                        btnObs.title = "Adicionar Observação";
+                        obsSalvaElem.textContent = '';
                     }
                 }
             });
@@ -429,9 +634,15 @@
             historico.forEach(registro => {
                 const item = document.createElement('div');
                 item.className = 'item-registro';
+                
+                let obsHtml = registro.obs ? `<div class="info-obs-hist">📝 <i>${registro.obs}</i></div>` : '';
+
                 item.innerHTML = `
-                    <div class="info-sala-hist">${registro.sala}</div>
-                    <div class="info-hora-hist">${registro.hora} <span style="font-size:10px; color:#94a3b8; font-weight:normal;">(${registro.data})</span></div>
+                    <div class="item-registro-topo">
+                        <div class="info-sala-hist">${registro.sala}</div>
+                        <div class="info-hora-hist">${registro.hora} <span style="font-size:10px; color:#94a3b8; font-weight:normal;">(${registro.data})</span></div>
+                    </div>
+                    ${obsHtml}
                 `;
                 containerLista.appendChild(item);
             });
@@ -454,7 +665,7 @@
             }
         }
 
-        /* Envio do WhatsApp Otimizado e Perfeitamente Espaçado */
+        /* Envio do WhatsApp Otimizado */
         function enviarWhatsApp() {
             let ultimosAcessos = JSON.parse(localStorage.getItem('v2_ultimos_acessos')) || {};
             let linhasTexto = [];
@@ -464,7 +675,11 @@
                 if (ultimosAcessos[sala] && ultimosAcessos[sala].hora) {
                     const pontosFaltantes = espacamentoFixo - sala.length;
                     const espacos = " ".repeat(pontosFaltantes > 0 ? pontosFaltantes : 1);
-                    linhasTexto.push(`${sala}:${espacos}${ultimosAcessos[sala].hora}`);
+                    let linha = `${sala}:${espacos}${ultimosAcessos[sala].hora}`;
+                    if (ultimosAcessos[sala].obs) {
+                        linha += ` (Obs: ${ultimosAcessos[sala].obs})`;
+                    }
+                    linhasTexto.push(linha);
                 }
             });
 
